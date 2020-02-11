@@ -1,6 +1,12 @@
 from functools import partial
 import math
 
+def pipe(start,*fs):
+    temp = start
+    for f in fs:
+        temp = f(temp)
+    return temp
+
 class Infix(object):
     def __init__(self, func):
         self.func = func
@@ -45,6 +51,17 @@ def change(f):
     
     return hidden
 
+def IsPrime(x):
+    if x in (2,3,5,7):
+        return True
+    elif x in (1,4,6,8,9):
+        return False
+    elif x % 2 == 0 or x < 0:
+        return False
+    else:
+        sqrt_x = int(math.sqrt(x)) + 1
+        return range(3,sqrt_x,2) \
+            | then | forall(lambda y : x % y != 0)
 
 def AllPairs(xs,ys):
     temp = []
@@ -91,11 +108,3 @@ def accumulate(f):
             return result
         return hidden2
     return hidden
-
-def sumby(f):
-    def inner(xs):
-        result = 0
-        for x in xs:
-            result = result + f(x)
-        return result
-    return inner

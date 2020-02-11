@@ -1,5 +1,5 @@
 
-from functional_util import keep, pipe, windowed, change, forall, AllPairs, reduce, accumulate
+from functional_util import then, keep, remove, windowed, change, forall, AllPairs, reduce, accumulate
 import math
 
 def IsPrime(x):
@@ -11,18 +11,16 @@ def IsPrime(x):
         return False
     else:
         sqrt_x = int(math.sqrt(x)) + 1
-        return pipe(range(3,sqrt_x,2),
-            forall(lambda y : x % y != 0))
+        return range(3,sqrt_x,2) \
+            | then | forall(lambda y : x % y != 0)
 
     
 # Question 1
 print("Question 01: ", end="")
-pipe(
-    range(1,1000),
-    keep(lambda x : x % 3 == 0 or x % 5 == 0),
-    sum,
-    print
-)
+range(1,1000) \
+| then | keep(lambda x : x % 3 == 0 or x % 5 == 0) \
+| then | sum \
+| then | print
 
 # Question 2
 print("Question 02: ", end="")
@@ -30,31 +28,25 @@ def next_fib(tp):
     (a,b) = tp
     return (b,a+b)
 fib_start = (1,2)
-base = pipe(
-    range(1,50),
-    accumulate(lambda _, tp: next_fib(tp))(fib_start),
-    change(lambda tp: tp[0])
-)
+base = \
+    range(1,50) \
+    | then | accumulate(lambda _, tp: next_fib(tp))(fib_start) \
+    | then | change(lambda tp: tp[0])
 
-pipe(
-    base,
-    keep(lambda x : x < 4000000),
-    keep(lambda x : x % 2 == 0),
-    sum,
-    print
-)
-
+base \
+| then | keep(lambda x : x < 4000000) \
+| then | keep(lambda x : x % 2 == 0) \
+| then | sum \
+| then | print
 
 # Question 3:
 # Warning: This is not the general way to solve this kind of problems!
 print("Question 03: ", end="")
-pipe(
-    range(1,780000),
-    keep(lambda x : 600851475143 % x == 0),
-    keep(IsPrime),
-    max,
-    print
-)
+range(1,780000) \
+| then | keep(lambda x : 600851475143 % x == 0) \
+| then | keep(IsPrime) \
+| then | max \
+| then | print
 
 # Question 4:
 print("Question 04: ", end="")
@@ -65,13 +57,11 @@ def IsPalindrome(x):
     s=str(x)
     return s == s[::-1]
 three_digits = range(1,1000)
-pipe(
-    AllPairs(three_digits,three_digits),
-    change(tuple_product),
-    keep(IsPalindrome),
-    max,
-    print,
-)
+AllPairs(three_digits,three_digits) \
+| then | change(tuple_product) \
+| then | keep(IsPalindrome) \
+| then | max \
+| then | print
 
 # Question 5:
 print("Question 05: ", end="")
@@ -88,41 +78,35 @@ def gcd(x,y):
 def lcm(x,y):
     return (x * y) // gcd(x,y)
 
-pipe(
-    range(1,21),
-    reduce(lcm)(1),
-    print
-)
+range(1,21) \
+| then | reduce(lcm)(1) \
+| then | print
 
 # Question 6:
 print("Question 06: ", end="")
-sum_of_squares = pipe(
-    range(1,101),
-    change(lambda x : x * x),
-    sum
-)
-square_of_sums = pipe(
-    range(1,101),
-    sum,
-    (lambda s: s * s)
-)
+sum_of_squares = \
+    range(1,101) \
+    | then | change(lambda x : x * x) \
+    | then | sum
+square_of_sums = \
+    range(1,101) \
+    | then | sum \
+    | then | (lambda s: s * s)
+
 print(square_of_sums - sum_of_squares)
 
 # Question 7:
 print("Question 07: ", end="")
-pipe(
-    range(1,500000),
-    keep(IsPrime),
-    (lambda xs: xs[10000]),
-    print
-)
+range(1,500000) \
+| then | keep(IsPrime) \
+| then | (lambda xs: xs[10000]) \
+| then | print
 
 # Question 8:
 print("Question 08: ", end="")
 def product(xs):
     return reduce(lambda x,y: x*y)(1)(xs)
 
-long_digits = \
 '''73167176531330624919225119674426574742355349194934
 96983520312774506326239578318016984801869478851843
 85861560789112949495459501737958331952853208805511
@@ -142,16 +126,12 @@ long_digits = \
 07198403850962455444362981230987879927244284909188
 84580156166097919133875499200524063689912560717606
 05886116467109405077541002256983155200055935729725
-71636269561882670428252483600823257530420752963450'''.replace('\n', '')
-
-pipe(
-    long_digits,
-    change(int),
-    windowed(13),
-    change(product),
-    max,
-    print
-)
+71636269561882670428252483600823257530420752963450'''.replace('\n','') \
+| then | change (int) \
+| then | windowed(13) \
+| then | change(product) \
+| then | max \
+| then | print
 
 # Question 9:
 print("Question 09: ", end="")
@@ -167,21 +147,18 @@ def t3(f):
     return hidden
 
 thousands = range(1,1001)
-pipe(
-    AllPairs(thousands, thousands),
-    change(t2(lambda a,b: (a,b,1000 - a - b))),
-    keep(t3(lambda a,b,c:a * a + b * b == c * c and  a < b < c)),
-    change(t3(lambda a,b,c: a * b * c)),
-    print
-)
+AllPairs(thousands, thousands) \
+| then | change(t2(lambda a,b: (a,b,1000 - a - b))) \
+| then | keep(t3(lambda a,b,c:a * a + b * b == c * c and  a < b < c)) \
+| then | change(t3(lambda a,b,c: a * b * c)) \
+| then | print
 
 # Question 10:
 # Not the most efficient method.
 print("Question 10: ", end="")
-pipe(
-    range(3,2000000,2),
-    keep(IsPrime),
-    sum,
-    (lambda s : s + 2),
-    print
-)
+range(3,2000000,2) \
+| then | keep(IsPrime) \
+| then | sum \
+| then | (lambda s : s + 2) \
+| then | print
+
