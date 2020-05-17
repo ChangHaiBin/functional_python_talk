@@ -1,5 +1,4 @@
 from functools import partial
-import math
 
 def pipe(start,*fs):
     temp = start
@@ -20,70 +19,26 @@ class Infix(object):
 then = Infix(lambda x,f: f(x))
 
 def keep(f):
-    def hidden(xs):
-        temp = []
-        for x in xs:
-            if f(x):
-                temp.append(x)
+    return lambda xs: [x for x in xs if f(x)]
 
-        return temp
-    
-    return hidden
 def remove(f):
-    return keep(lambda x: not(f(x)))
-def forall(f):
-    def hidden(xs):
-        for x in xs:
-            if not(f(x)):
-                return False
-
-        return True
-    
-    return hidden
+    return lambda xs: [x for x in xs if not f(x)]
 
 def change(f):
-    def hidden(xs):
-        temp = []
-        for x in xs:
-            temp.append(f(x))
+    return lambda xs: [f(x) for x in xs]
 
-        return temp
-    
-    return hidden
-
-def IsPrime(x):
-    if x in (2,3,5,7):
-        return True
-    elif x in (1,4,6,8,9):
-        return False
-    elif x % 2 == 0 or x < 0:
-        return False
-    else:
-        sqrt_x = int(math.sqrt(x)) + 1
-        return range(3,sqrt_x,2) \
-            | then | forall(lambda y : x % y != 0)
+def forall(f):
+    return lambda xs: all(f(x) for x in xs)
 
 def AllPairs(xs,ys):
-    temp = []
-    for x in xs:
-        for y in ys:
-            temp.append((x,y))
-
-    return temp
+    return [(x,y) for x in xs for y in ys]
 
 def windowed(n):
-    def hidden(xs):
-        result = []
-        temp = []
-        for x in xs:
-            temp.append(x)
-            if len(temp) == n:
-                result.append(temp)
-                temp = temp[1:]
-
-        return result
-        
-    return hidden
+    return lambda xs: [
+        xs[i:][0:n]
+        for i in range(0,len(xs))
+        if len(xs[i:][0:n]) == n
+    ]
 
 def reduce(f):
     def hidden(x0):
@@ -108,3 +63,14 @@ def accumulate(f):
             return result
         return hidden2
     return hidden
+
+def accumulate_with(fs):
+    def inner(x0):
+        temp = x0
+        result = []
+        result.append(temp)
+        for f in fs:
+            temp = f(temp)
+            result.append(temp)
+        return result
+    return inner

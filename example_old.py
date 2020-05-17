@@ -1,5 +1,5 @@
 
-from functional_util import then, keep, remove, windowed, change, forall, AllPairs, reduce, accumulate
+from functional_util2 import then, keep, remove, windowed, change, forall, AllPairs, reduce, accumulate
 import math
 
 def IsPrime(x):

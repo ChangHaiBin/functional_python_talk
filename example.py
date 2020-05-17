@@ -1,5 +1,5 @@
 
-from functional_util import keep, pipe, windowed, change, forall, AllPairs, reduce, accumulate
+from functional_util import keep, pipe, windowed, change, forall, AllPairs, accumulate_with
 import math
 
 def IsPrime(x):
@@ -14,7 +14,7 @@ def IsPrime(x):
         return pipe(range(3,sqrt_x,2),
             forall(lambda y : x % y != 0))
 
-    
+
 # Question 1
 print("Question 01: ", end="")
 pipe(
@@ -24,6 +24,7 @@ pipe(
     print
 )
 
+
 # Question 2
 print("Question 02: ", end="")
 def next_fib(tp):
@@ -31,8 +32,8 @@ def next_fib(tp):
     return (b,a+b)
 fib_start = (1,2)
 base = pipe(
-    range(1,50),
-    accumulate(lambda _, tp: next_fib(tp))(fib_start),
+    fib_start,
+    accumulate_with([next_fib for _ in range(0,50)]),
     change(lambda tp: tp[0])
 )
 
@@ -85,12 +86,12 @@ def gcd(x,y):
     else:
         return gcd(y%x,x)
 
-def lcm(x,y):
-    return (x * y) // gcd(x,y)
+def lcm_with(x):
+    return lambda y: (x * y) // gcd(x,y)
 
 pipe(
-    range(1,21),
-    reduce(lcm)(1),
+    1,
+    *[lcm_with(i) for i in range(1,21)],
     print
 )
 
@@ -119,8 +120,13 @@ pipe(
 
 # Question 8:
 print("Question 08: ", end="")
+def multiply_with(x):
+    return lambda y: x * y
 def product(xs):
-    return reduce(lambda x,y: x*y)(1)(xs)
+    return pipe(
+        1,
+        *[multiply_with(x) for x in xs]
+    )
 
 long_digits = \
 '''73167176531330624919225119674426574742355349194934
